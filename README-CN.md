@@ -51,6 +51,21 @@ Komari-Next 是 Komari 监控项目的现代化前端。
 
 * 直接[下载主题文件](https://github.com/tonyliuzj/komari-next/releases/latest/download/dist-release.zip)，并通过 Komari 管理后台上传，这是推荐方式。
 
+### 通过 Komari 后台直接上传（推荐）
+
+如果你是从本仓库获取已打包好的主题包，建议直接使用 `packages/` 目录中的上传专用 zip 文件：
+
+* 推荐包：`packages/komari-next-upload-ready-20260516-155451.zip`
+* 适用方式：在 **Komari 管理后台 → 主题管理** 中直接上传
+* 说明：该 zip 包面向后台上传场景准备，通常比自行构建和重新打包更省事
+
+建议流程：
+
+1. 打开 Komari 管理后台。
+2. 进入主题管理页面。
+3. 上传 `packages/komari-next-upload-ready-20260516-155451.zip`。
+4. 上传完成后启用该主题，并按需调整主题配置。
+
 ## 开发
 
 克隆本仓库并安装依赖：
@@ -92,6 +107,8 @@ npm run build
 
 * 使用任意静态 Web 服务器托管 `dist` 目录，**或**
 * 将 `dist` 内容作为 Komari 主题包的一部分使用。
+
+如果你的目标只是部署到 Komari 后台，通常不必手动处理 `dist/`；优先使用 `packages/` 目录下已准备好的上传专用 zip 包即可。
 
 ## Nginx 生产环境优化建议
 
