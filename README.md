@@ -53,6 +53,16 @@ It is built with **Next.js**, **TypeScript**, **Tailwind CSS** and **Shadcn UI**
 
 - Simply [download theme file](https://github.com/tonyliuzj/komari-next/releases/latest/download/dist-release.zip) and upload it through Komari's admin dashboard, this would be the recommanded way.
 
+### 中文：通过主题管理上传
+
+- 推荐直接使用仓库内的打包文件：`packages/komari-next-upload-ready-20260516-155451.zip`
+- 这个压缩包适合在 Komari 后台的“主题管理”中直接上传
+- 上传包的 ZIP 根目录应直接包含以下内容：
+  - `dist/`
+  - `komari-theme.json`
+  - `preview.png`
+- 上传完成后，如果主题没有立即生效，可以先刷新后台或前台页面；如仍未生效，再按需重启 Komari 容器
+
 ## Dev
 
 Clone this repository and install dependencies:
