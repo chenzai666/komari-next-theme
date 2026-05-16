@@ -158,7 +158,3 @@ gzip_vary on;
 
 欢迎贡献。
 如果你发现问题或有改进建议，欢迎提交 issue 或 pull request。
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=tonyliuzj/komari-next&type=date&legend=top-left)](https://www.star-history.com/#tonyliuzj/komari-next&type=date&legend=top-left)
