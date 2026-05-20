@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { usePathname } from "next/navigation";
 import { X, MapPin, Wifi, Globe2, CalendarDays, MonitorSmartphone, Sparkles } from "lucide-react";
@@ -35,21 +35,6 @@ const fetchStrategies: Array<{
   url: string;
   map: (payload: any) => VisitorGeo | null;
 }> = [
-  {
-    name: "ipwho.is",
-    url: "https://ipwho.is/",
-    map: (payload) => payload?.success === true ? {
-      ip: payload.ip,
-      city: payload.city,
-      region: payload.region,
-      country: payload.country,
-      countryCode: payload.country_code,
-      isp: payload.connection?.isp,
-      org: payload.connection?.org,
-      lat: payload.latitude,
-      lng: payload.longitude,
-    } : null,
-  },
   {
     name: "api.ip.sb",
     url: "https://api.ip.sb/geoip",
@@ -155,7 +140,9 @@ export default function WelcomeVisitorCard() {
   const [t] = useTranslation();
   const pathname = usePathname();
   const { publicInfo } = usePublicInfo();
-  const [dateText, setDateText] = useState(formatVisitorDate());
+  const [isClientReady, setIsClientReady] = useState(false);
+  const [dateText, setDateText] = useState("--");
+  const [ua, setUa] = useState(() => UserAgentHelper.parse(""));
   const [state, setState] = useState<VisitorCardState>({
     loading: true,
     hidden: false,
@@ -164,6 +151,11 @@ export default function WelcomeVisitorCard() {
 
   useEffect(() => {
     let cancelled = false;
+
+    setIsClientReady(true);
+    setDateText(formatVisitorDate());
+    setUa(UserAgentHelper.parse());
+
     void fetchVisitorGeo().then((geo) => {
       if (!cancelled) {
         setState((prev) => ({ ...prev, loading: false, geo }));
@@ -177,7 +169,6 @@ export default function WelcomeVisitorCard() {
     };
   }, []);
 
-  const ua = useMemo(() => UserAgentHelper.parse(), []);
   const geo = state.geo;
   const derivedFlagCode = geo.countryCode || (geo.country ? geo.country.slice(0, 2).toUpperCase() : undefined);
   const flagCode = derivedFlagCode && /^[A-Z]{2}$/.test(derivedFlagCode) ? derivedFlagCode : "UN";
@@ -185,8 +176,8 @@ export default function WelcomeVisitorCard() {
   const displayIsp = pick(geo.isp, geo.org, state.loading ? "识别中..." : "未知网络");
   const welcomeMessage = state.loading ? "正在识别你的来访信息..." : buildWelcomeMessage(geo);
   const siteName = publicInfo?.sitename || t("common.dashboard", { defaultValue: "Dashboard" });
-  const browserText = `${ua.browser}/${ua.version || "--"}`;
-  const locationText = `${buildLocationLine(geo)} · ${ua.device}`;
+  const browserText = isClientReady ? `${ua.browser}/${ua.version || "--"}` : "Unknown/--";
+  const locationText = `${buildLocationLine(geo)} · ${isClientReady ? ua.device : "Unknown"}`;
 
   const handleClose = () => {
     setState((prev) => ({ ...prev, hidden: true }));
