@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { normalizeNodeSelectedGroup } from "@/utils/nodeGroupSelection";
 
 interface NodeDisplayProps {
   nodes: NodeBasicInfo[];
@@ -40,6 +41,17 @@ const NodeDisplay: React.FC<NodeDisplayProps> = ({ nodes, liveData }) => {
     });
     return Array.from(groupSet).sort();
   }, [nodes]);
+
+  const normalizedSelectedGroup = useMemo(
+    () => normalizeNodeSelectedGroup(selectedGroup, groups),
+    [selectedGroup, groups]
+  );
+
+  useEffect(() => {
+    if (selectedGroup !== normalizedSelectedGroup) {
+      setSelectedGroup(normalizedSelectedGroup);
+    }
+  }, [selectedGroup, normalizedSelectedGroup, setSelectedGroup]);
 
   // 判断是否显示分组选择器
   const showGroupSelector = groups.length >= 1;
@@ -68,8 +80,8 @@ const NodeDisplay: React.FC<NodeDisplayProps> = ({ nodes, liveData }) => {
     let result = nodes;
 
     // 先按分组过滤
-    if (selectedGroup !== "all") {
-      result = result.filter((node) => node.group === selectedGroup);
+    if (normalizedSelectedGroup !== "all") {
+      result = result.filter((node) => node.group === normalizedSelectedGroup);
     }
 
     // 再按搜索条件过滤
@@ -98,7 +110,7 @@ const NodeDisplay: React.FC<NodeDisplayProps> = ({ nodes, liveData }) => {
 
       return basicMatch || regionMatch || priceMatch || statusMatch;
     });
-  }, [nodes, searchTerm, liveData, selectedGroup]);
+  }, [nodes, searchTerm, liveData, normalizedSelectedGroup]);
 
   return (
     <div className="w-full space-y-6">
@@ -164,7 +176,7 @@ const NodeDisplay: React.FC<NodeDisplayProps> = ({ nodes, liveData }) => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {showGroupSelector && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-            <Tabs value={selectedGroup} onValueChange={setSelectedGroup} className="w-auto">
+            <Tabs value={normalizedSelectedGroup} onValueChange={setSelectedGroup} className="w-auto">
               <TabsList className="h-10 bg-muted/50 p-1 border">
                 <TabsTrigger value="all" className="px-4">
                   {t("common.all", { defaultValue: "All" })}
@@ -187,27 +199,27 @@ const NodeDisplay: React.FC<NodeDisplayProps> = ({ nodes, liveData }) => {
               {t("search.results", {
                 count: filteredNodes.length,
                 total:
-                  selectedGroup === "all"
+                  normalizedSelectedGroup === "all"
                     ? nodes.length
-                    : nodes.filter((n) => n.group === selectedGroup).length,
+                    : nodes.filter((n) => n.group === normalizedSelectedGroup).length,
                 defaultValue: `Found ${filteredNodes.length} nodes`,
               })}
             </span>
           ) : (
             <span className="text-sm font-medium text-muted-foreground">
-              {selectedGroup === "all"
+              {normalizedSelectedGroup === "all"
                 ? t("nodeCard.totalNodes", {
                     total: nodes.length,
                     online: liveData?.online?.length || 0,
                     defaultValue: `${liveData?.online?.length || 0} Online / ${nodes.length} Total`,
                   })
                 : t("nodeCard.groupNodes", {
-                    group: selectedGroup,
+                    group: normalizedSelectedGroup,
                     total: filteredNodes.length,
                     online: filteredNodes.filter((n) =>
                       liveData?.online?.includes(n.uuid)
                     ).length,
-                    defaultValue: `${filteredNodes.filter((n) => liveData?.online?.includes(n.uuid)).length} Online in ${selectedGroup}`,
+                    defaultValue: `${filteredNodes.filter((n) => liveData?.online?.includes(n.uuid)).length} Online in ${normalizedSelectedGroup}`,
                   })}
             </span>
           )}
